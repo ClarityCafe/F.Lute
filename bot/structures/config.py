@@ -18,7 +18,7 @@ class Config:
             return cls(**json.load(f))
         
     @classmethod
-    def from_environment(self) -> 'Config':
+    def from_environment(cls) -> 'Config':
 
         # derive a config from a dict
         derived_config = {
@@ -27,4 +27,4 @@ class Config:
             "token": os.environ["FLUTE_BOT_TOKEN"]
         }
 
-        return derived_config
+        return cls(**derived_config)
