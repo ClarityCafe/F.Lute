@@ -11,7 +11,7 @@
     "env": {
       "FLUTE_PREFIX": {
         "description": "Prefix for the bot",
-        "generator": "flute "
+        "value": "flute "
       },
       "FLUTE_BOT_ID": {
         "description": "the client ID for the bot.",
