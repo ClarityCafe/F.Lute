@@ -18,7 +18,7 @@ class Config:
             return cls(**json.load(f))
         
     @classmethod
-    def from_environment() -> 'Config':
+    def from_environment(self) -> 'Config':
 
         # derive a config from a dict
         derived_config = {
