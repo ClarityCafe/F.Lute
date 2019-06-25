@@ -115,7 +115,7 @@ class VoiceChannelCog(Cog):
         for guild in self.bot.guilds:
             info(f"Setting up VoiceChannel for guild {guild.name}")
             await self.bot.get_cog('Events').wait_for_ready_complete(guild)
-            channel = get(guild.text_channels, name="flute-configuration")
+            channel = get(guild.text_channels, name=self.bot.channel_name)
             ctx = VoiceChannel(channel, self.bot)
             await ctx.setup()
             self.contexts[guild.id] = ctx
@@ -127,7 +127,7 @@ class VoiceChannelCog(Cog):
         debug(f"Setting up VoiceChannel for guild {guild.name}")
 
         await self.bot.get_cog('Events').wait_for_join_complete(guild)
-        channel = get(guild.text_channels, name="flute-configuration")
+        channel = get(guild.text_channels, name=self.bot.channel_name)
 
         ctx = VoiceChannel(channel, self.bot)
         await ctx.setup()
@@ -142,7 +142,7 @@ class VoiceChannelCog(Cog):
     async def on_guild_channel_delete(self, channel: GuildChannel):
         if isinstance(channel, VoiceChannel) and channel.guild.id in self.contexts:
             await self.contexts[channel.guild.id].refresh_role_list()
-        elif channel.name == "flute-configuration":
+        elif channel.name == self.bot.channel_name:
             del self.contexts[channel.guild.id]
 
     @Cog.listener()

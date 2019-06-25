@@ -98,7 +98,7 @@ class RoleAccessCog(Cog):
         for guild in self.bot.guilds:
             info(f"Setting up RoleAccess for guild {guild.name}")
             await self.bot.get_cog('Events').wait_for_ready_complete(guild)
-            channel = get(guild.text_channels, name="flute-configuration")
+            channel = get(guild.text_channels, name=self.bot.channel_name)
             ctx = RoleAccess(channel, self.bot)
             await ctx.setup()
             self.contexts[guild.id] = ctx
@@ -110,7 +110,7 @@ class RoleAccessCog(Cog):
         debug(f"Setting up RoleAccess for guild {guild.name}")
 
         await self.bot.get_cog('Events').wait_for_join_complete(guild)
-        channel = get(guild.text_channels, name="flute-configuration")
+        channel = get(guild.text_channels, name=self.bot.channel_name)
 
         ctx = RoleAccess(channel, self.bot)
         await ctx.setup()
@@ -133,7 +133,7 @@ class RoleAccessCog(Cog):
 
     @Cog.listener()
     async def on_guild_channel_delete(self, channel: GuildChannel):
-        if channel.name == "flute-configuration":
+        if channel.name == self.bot.channel_name:
             del self.contexts[channel.guild.id]
 
 

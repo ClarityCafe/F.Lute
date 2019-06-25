@@ -18,6 +18,7 @@ class MusicBot(Bot):
 
         self.token = cfg.token
         self.bot_id = cfg.bot_id
+        self.channel_name = cfg.channel_name
 
         for cog in self.__cogs:
             self.load_extension(cog)

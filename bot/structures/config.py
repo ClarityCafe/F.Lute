@@ -10,6 +10,7 @@ DEFAULT_PATH = "./config.json"
 class Config:
     bot_id: int
     token: str
+    channel_name: str
     prefix: List[str] = field(default_factory=list)
 
     @classmethod
@@ -24,5 +25,6 @@ class Config:
         return cls(
             prefix=os.environ["FLUTE_PREFIX"].split(":"),
             bot_id=int(os.environ["FLUTE_BOT_ID"]),
-            token=os.environ["FLUTE_BOT_TOKEN"]
+            token=os.environ["FLUTE_BOT_TOKEN"],
+            channel_name=os.environ["FLUTE_CHANNEL_NAME"]
         )

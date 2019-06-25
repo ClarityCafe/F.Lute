@@ -35,7 +35,7 @@ class Events(Cog):
         for guild in self.bot.guilds:
             if guild.id not in self.ready_locks:
                 self.ready_locks[guild.id] = Event()
-            channel = get(guild.text_channels, name="flute-configuration")
+            channel = get(guild.text_channels, name=self.bot.channel_name)
             if channel is None:
                 await self.on_guild_join(guild)
                 continue
@@ -63,7 +63,7 @@ class Events(Cog):
         }
 
         channel = await guild.create_text_channel(
-            "flute-configuration",
+            self.bot.channel_name,
             overwrites=overwrites,
             topic="This is the configuration channel for f-lute, please do NOT delete this, or the bot will leave"
         )
@@ -72,7 +72,7 @@ class Events(Cog):
 
     @Cog.listener()
     async def on_guild_channel_delete(self, channel: GuildChannel):
-        if channel.name == "flute-configuration":
+        if channel.name == self.bot.channel_name:
             await channel.guild.leave()
 
 
