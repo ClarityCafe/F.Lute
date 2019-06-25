@@ -1,0 +1,31 @@
+{
+    "name": "F.Lute",
+    "description": "DSP as a Discord Bot",
+    "keywords": [
+      "Entertainment",
+      "python",
+      "bot"
+    ],
+    "repository": "https://github.com/ClarityCafe/F.Lute",
+    "logo": "https://cdn.discordapp.com/avatars/436026947974463488/7eb55b489b3335e1bf78891bc3b38ae1.png?size=512",
+    "env": {
+      "FLUTE_PREFIX": {
+        "description": "Prefix for the bot",
+        "generator": "flute "
+      },
+      "FLUTE_BOT_ID": {
+        "description": "the client ID for the bot.",
+        "value": ""
+      },
+      "FLUTE_BOT_TOKEN": {
+        "description": "Discord bot token for the bot.",
+        "value": ""
+      }
+    },
+    "stack": "container",
+    "formation": {
+      "worker": {
+        "quantity": 1
+      }
+    }
+  }
