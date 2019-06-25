@@ -3,8 +3,7 @@ from bot.structures.config import Config
 import os
 
 if __name__ == "__main__":
-    cfg = Config.from_file("./config.json")
-
+    
     if os.path.exists("./config.json"):
         cfg = Config.from_file("./config.json")
     else:
