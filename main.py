@@ -4,10 +4,10 @@ import os
 
 if __name__ == "__main__":
     
-    if os.path.exists("./config.json"):
-        cfg = Config.from_file("./config.json")
-    else:
+    if not os.path.exists("config.json"):
         cfg = Config.from_environment()
+    else:
+        cfg = Config.from_file("config.json")
 
     bot = MusicBot(cfg)
     bot.run()
