@@ -6,9 +6,8 @@ from discord.abc import GuildChannel
 from discord.utils import get
 
 from bot.bot import MusicBot
-from bot.cogs.role_access import RoleAccess
 from bot.structures.cog import Cog
-from utils.logging import debug, info, warn
+from utils.logging import debug
 
 
 class Events(Cog):

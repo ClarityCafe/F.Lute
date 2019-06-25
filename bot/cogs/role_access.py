@@ -1,13 +1,13 @@
 from typing import Dict
 
-from discord import Guild, PermissionOverwrite, TextChannel, Member, Reaction, Role
+from discord import Guild, TextChannel, Member, Reaction, Role
 from discord.abc import GuildChannel
 from discord.utils import get
 
 from bot.bot import MusicBot
 from bot.structures.cog import Cog
 from bot.structures.menu import MenuContext, event_class, event
-from utils.logging import info, debug, warn
+from utils.logging import info, debug
 
 
 @event_class
@@ -42,7 +42,7 @@ Select a role that's allowed to use commands:
 
     async def load(self):
         content = self.msg_object.content
-        message = content[7+len(self.id):-3]
+        message = content[7 + len(self.id):-3]
         lines = message.split("\n")
         role_name = ""
         for line in lines[1:]:
@@ -73,7 +73,7 @@ Select a role that's allowed to use commands:
 
     @event("\N{BLACK DOWN-POINTING DOUBLE TRIANGLE}")
     async def last(self):
-        self.selected_role = self.all_channels[len(self.all_roles) - 1]
+        self.selected_role = self.all_roles[len(self.all_roles) - 1]
         await self.update_roles()
 
 

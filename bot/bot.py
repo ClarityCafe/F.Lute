@@ -17,6 +17,7 @@ class MusicBot(Bot):
             super().__init__(when_mentioned_or(*cfg.prefix))
 
         self.token = cfg.token
+        self.bot_id = cfg.bot_id
 
         for cog in self.__cogs:
             self.load_extension(cog)

@@ -8,9 +8,9 @@ DEFAULT_PATH = "./config.json"
 
 @dataclass
 class Config:
-    prefix: str
     bot_id: int
-    token: Union[str, List[str]] = field(default_factory=list)
+    token: str
+    prefix: List[str] = field(default_factory=list)
 
     @classmethod
     def from_file(cls, file_name: str = DEFAULT_PATH) -> 'Config':
@@ -21,10 +21,8 @@ class Config:
     def from_environment(cls) -> 'Config':
 
         # derive a config from a dict
-        derived_config = {
-            "prefix": os.environ["FLUTE_PREFIX"],
-            "bot_id": int(os.environ["FLUTE_BOT_ID"]),
-            "token": os.environ["FLUTE_BOT_TOKEN"]
-        }
-
-        return cls(**derived_config)
+        return cls(
+            prefix=os.environ["FLUTE_PREFIX"].split(":"),
+            bot_id=int(os.environ["FLUTE_BOT_ID"]),
+            token=os.environ["FLUTE_BOT_TOKEN"]
+        )

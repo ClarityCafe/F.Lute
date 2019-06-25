@@ -1,13 +1,13 @@
 from typing import Dict
 
-from discord import Guild, PermissionOverwrite, TextChannel, Member, Reaction, Role
+from discord import Guild, PermissionOverwrite, TextChannel, Member, Reaction
 from discord.abc import GuildChannel
 from discord.utils import get
 
 from bot.bot import MusicBot
 from bot.structures.cog import Cog
 from bot.structures.menu import MenuContext, event_class, event
-from utils.logging import info, debug, warn
+from utils.logging import info, debug
 
 
 @event_class
@@ -59,7 +59,7 @@ Select a voice channel for me to occupy:
 
     async def load(self):
         content = self.msg_object.content
-        message = content[7+len(self.id):-3]
+        message = content[7 + len(self.id):-3]
         lines = message.split("\n")
         channel_name = ""
         for line in lines[1:]:

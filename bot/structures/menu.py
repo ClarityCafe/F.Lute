@@ -1,5 +1,3 @@
-from typing import Dict, Callable
-
 from discord import TextChannel, Message, Reaction, Member
 
 from bot.structures.config import Config
@@ -9,6 +7,7 @@ def event(emote: str):
     def decorator(func):
         func.listen_emote = emote
         return func
+
     return decorator
 
 
@@ -26,7 +25,6 @@ class MenuContext:
     id = ""
     message: str = "<placeholder>"
     msg_object: Message = None
-    cfg: Config = Config.from_file()
 
     def __init__(self, channel: TextChannel):
         self.channel = channel
@@ -37,7 +35,7 @@ class MenuContext:
 
     async def pull_from_channel(self):
         async for message in self.channel.history():
-            if message.author.id == self.cfg.bot_id and message.content.startswith(f"**{self.id}**"):
+            if message.author.id == self.bot.bot_id and message.content.startswith(f"**{self.id}**"):
                 self.msg_object = message
                 break
 
