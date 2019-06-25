@@ -14,10 +14,10 @@ from utils.logging import info, debug
 class RoleAccess(MenuContext):
     id = "Role Access"
 
-    def __init__(self, channel: TextChannel):
+    def __init__(self, channel: TextChannel, bot: MusicBot):
         self.selected_role = channel.guild.default_role
         self.all_roles = channel.guild.roles[::-1]
-        super().__init__(channel)
+        super().__init__(channel, bot)
 
     async def setup(self):
         await super().setup()
@@ -99,7 +99,7 @@ class RoleAccessCog(Cog):
             info(f"Setting up RoleAccess for guild {guild.name}")
             await self.bot.get_cog('Events').wait_for_ready_complete(guild)
             channel = get(guild.text_channels, name="flute-configuration")
-            ctx = RoleAccess(channel)
+            ctx = RoleAccess(channel, self.bot)
             await ctx.setup()
             self.contexts[guild.id] = ctx
             self.bot._connection._messages.append(ctx.msg_object)  # Manually adding it to cache since history() doesn't
@@ -112,7 +112,7 @@ class RoleAccessCog(Cog):
         await self.bot.get_cog('Events').wait_for_join_complete(guild)
         channel = get(guild.text_channels, name="flute-configuration")
 
-        ctx = RoleAccess(channel)
+        ctx = RoleAccess(channel, self.bot)
         await ctx.setup()
         self.contexts[guild.id] = ctx
 

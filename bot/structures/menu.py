@@ -1,5 +1,6 @@
 from discord import TextChannel, Message, Reaction, Member
 
+from bot.bot import MusicBot
 from bot.structures.config import Config
 
 
@@ -26,8 +27,9 @@ class MenuContext:
     message: str = "<placeholder>"
     msg_object: Message = None
 
-    def __init__(self, channel: TextChannel):
+    def __init__(self, channel: TextChannel, bot: MusicBot):
         self.channel = channel
+        self.bot = bot
 
     async def set_message(self, msg: str):
         self.message = f"**{self.id}**```{msg}```"

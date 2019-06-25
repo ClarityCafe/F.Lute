@@ -14,13 +14,13 @@ from utils.logging import info, debug
 class VoiceChannel(MenuContext):
     id = "Voice Channel"
 
-    def __init__(self, channel: TextChannel):
+    def __init__(self, channel: TextChannel, bot: MusicBot):
         try:
             self.selected_channel = channel.guild.voice_channels[0]
         except IndexError:
             self.selected_channel = None
         self.all_channels = channel.guild.voice_channels[::-1]
-        super().__init__(channel)
+        super().__init__(channel, bot)
 
     async def setup(self):
         if self.selected_channel is None:
@@ -116,7 +116,7 @@ class VoiceChannelCog(Cog):
             info(f"Setting up VoiceChannel for guild {guild.name}")
             await self.bot.get_cog('Events').wait_for_ready_complete(guild)
             channel = get(guild.text_channels, name="flute-configuration")
-            ctx = VoiceChannel(channel)
+            ctx = VoiceChannel(channel, self.bot)
             await ctx.setup()
             self.contexts[guild.id] = ctx
             self.bot._connection._messages.append(ctx.msg_object)  # Manually adding it to cache since history() doesn't
@@ -129,7 +129,7 @@ class VoiceChannelCog(Cog):
         await self.bot.get_cog('Events').wait_for_join_complete(guild)
         channel = get(guild.text_channels, name="flute-configuration")
 
-        ctx = VoiceChannel(channel)
+        ctx = VoiceChannel(channel, self.bot)
         await ctx.setup()
         self.contexts[guild.id] = ctx
 
