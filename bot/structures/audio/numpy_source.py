@@ -10,11 +10,11 @@ class NumpyAudioSource(AudioSource):
         top_bound = numpy.max(numpy.abs(audio))
         typ = numpy.int16
         self.audio = (audio / top_bound * numpy.iinfo(typ).max).astype(typ)
-        self.buffer = BytesIO(self.audio.tostring())
+        self.buffer = BytesIO(self.audio.tobytes())
         self.sample_rate = sample_rate
 
     def read(self):
-        audio = self.buffer.read(Encoder.FRAME_SIZE)
+        audio = self.buffer.read(int(Encoder.FRAME_SIZE / 48000 * self.sample_rate))
         return audio
 
     def cleanup(self):

@@ -55,7 +55,10 @@ class ContextAudioSource(AudioSource):
         data = self.current_source.read()
         if not data:
             self.current_source.cleanup()
-            self.current_source = self.ctx.queue.pop()
-            data = self.current_source.read()
+            if self.ctx.queue:
+                self.current_source = self.ctx.queue.pop()
+                data = self.current_source.read()
+            else:
+                self.current_source = None
 
         return data
