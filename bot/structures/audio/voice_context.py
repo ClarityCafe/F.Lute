@@ -25,6 +25,8 @@ class VoiceContext:
 
     async def connect(self, channel: VoiceChannel):
         if self.client is None:
+            client = await channel.connect()
+            await client.disconnect(force=True)  # If we were still here from before reboot
             self.client = await channel.connect(reconnect=True)
             self.play()
         else:
