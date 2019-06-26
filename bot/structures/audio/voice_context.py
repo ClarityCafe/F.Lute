@@ -4,6 +4,7 @@ from discord import VoiceChannel, AudioSource
 from discord.ext.commands import Context
 
 from bot.structures.audio.queue import Queue, QABC
+from utils.logging import info
 
 
 class VoiceContext:
@@ -14,11 +15,12 @@ class VoiceContext:
 
     def play_source(self, ctx: Context, source: AudioSource):
         self.queue.add(ctx, source)
-        if not self.client.playing:
+        if not self.client.is_playing():
             self.play()
 
     def play(self, *_):
-        if self.queue and not self.client.is_playing:
+        if self.queue and not self.client.is_playing():
+            info("Playing song!")
             self.client.play(self.source, after=self.play)
 
     async def connect(self, channel: VoiceChannel):
