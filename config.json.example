@@ -1,6 +1,6 @@
 {
     "bot_id": 123456789,
     "token": "<bot token here>",
-    "prefix": ["flute", "f-lute", "lute"],
+    "prefix": ["flute ", "f-lute ", "lute "],
     "channel_name": "flute-configuration"
 }

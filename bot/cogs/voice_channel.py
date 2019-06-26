@@ -57,6 +57,9 @@ Select a voice channel for me to occupy:
             """).strip()
         )
 
+        ctx = self.bot.get_cog('Commands').contexts[self.channel.guild.id]
+        await ctx.connect(self.selected_channel)
+
     async def load(self):
         content = self.msg_object.content
         message = content[7 + len(self.id):-3]

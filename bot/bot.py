@@ -6,6 +6,7 @@ from bot.structures.config import Config
 class MusicBot(Bot):
     __cogs = (
         "bot.cogs.events",
+        "bot.cogs.audio_commands",
         "bot.cogs.role_access",
         "bot.cogs.voice_channel"
     )

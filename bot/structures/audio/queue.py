@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABC
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from discord import AudioSource
 from discord.ext.commands import Context
@@ -11,6 +11,14 @@ class QABC(ABC):
         ...
 
     @abstractmethod
+    def add_raw(self, uid: int, source: AudioSource):
+        ...
+
+    @abstractmethod
+    def pop_pair(self) -> Tuple[int, AudioSource]:
+        ...
+
+    @abstractmethod
     def pop(self) -> AudioSource:
         ...
 
@@ -18,21 +26,40 @@ class QABC(ABC):
     def peek(self) -> AudioSource:
         ...
 
+    def __bool__(self) -> bool:
+        return False
+
 
 class Queue(QABC):
     """ Simple FIFO queue """
 
     def __init__(self):
+        self._users: List[int] = []
         self._queue: List[AudioSource] = []
 
     def add(self, ctx: Context, source: AudioSource):
+        self.add_raw(ctx.author.id, source)
+
+    def add_raw(self, uid: int, source: AudioSource):
+        self._users.append(uid)
         self._queue.append(source)
 
+    def pop_pair(self):
+        return self._users.pop(), self._queue.pop()
+
     def pop(self):
+        self._users.pop()
         return self._queue.pop(0)
 
     def peek(self):
         return self._queue[0]
+
+    def __bool__(self) -> bool:
+        try:
+            self.peek()
+            return True
+        except IndexError:
+            return False
 
 
 class RotatingQueue(QABC):
@@ -40,12 +67,19 @@ class RotatingQueue(QABC):
         self._queues: Dict[int, List[AudioSource]] = {}
         self._users: List[int] = []
 
-    def add(self, ctx: Context, source: AudioSource):
-        if ctx.author.id not in self._users:
-            self._users.append(ctx.author.id)
-            self._queues[ctx.author.id] = []
+    def add_raw(self, uid: int, source: AudioSource):
+        if uid not in self._users:
+            self._users.append(uid)
+            self._queues[uid] = []
 
-        self._queues[ctx.author.id].append(source)
+        self._queues[uid].append(source)
+
+    def add(self, ctx: Context, source: AudioSource):
+        self.add_raw(ctx.author.id, source)
+
+    def pop_pair(self):
+        user = self._users[0]
+        return user, self.pop()
 
     def pop(self):
         user = self._users.pop(0)
@@ -61,3 +95,10 @@ class RotatingQueue(QABC):
         user = self._users[0]
         song = self._queues[user][0]
         return song
+
+    def __bool__(self) -> bool:
+        try:
+            self.peek()
+            return True
+        except IndexError:
+            return False
