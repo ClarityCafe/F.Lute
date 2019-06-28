@@ -41,7 +41,7 @@ class VoiceChannel(MenuContext):
             )
 
     async def refresh_role_list(self):
-        self.all_channels = self.channel.guild.roles[::-1]
+        self.all_channels = self.channel.guild.voice_channels[::-1]
         if self.selected_channel not in self.all_channels:
             await self.get_default_vc()
         await self.update_channels()

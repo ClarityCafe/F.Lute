@@ -402,12 +402,12 @@ Fair Queue: {self.fair}
 
 class MusicSettingsCog(Cog):
     EXT_CLASSES = (VolumeSettings, EqualizerSettings, SpeedSettings,
-                   ReverberationSettings, EqualLoudnessSettings, PanSettings,
-                   QueueSettings)
+                   ReverberationSettings, EqualLoudnessSettings, PanSettings)
 
     def __init__(self, bot: MusicBot):
         super().__init__(bot)
         self.contexts: Dict[int, Dict[str, MusicSettings]] = {}
+        self.queue_settings: Dict[int, QueueSettings] = {}
 
     @Cog.listener()
     async def on_reaction_add(self, reaction: Reaction, user: Member):
@@ -417,6 +417,7 @@ class MusicSettingsCog(Cog):
         ctx = self.contexts[user.guild.id]
         for name, ct in ctx.items():
             await ct.on_reaction_add(reaction, user)
+        await self.queue_settings[user.guild.id].on_reaction_add(reaction, user)
 
     @Cog.listener()
     async def on_guild_join(self, guild: Guild):
@@ -430,6 +431,9 @@ class MusicSettingsCog(Cog):
             obj = cls(channel, self.bot)
             await obj.setup()
             data[cls.__name__] = obj
+        obj = QueueSettings(channel, self.bot)
+        await obj.setup()
+        self.queue_settings[guild.id] = obj
         self.contexts[guild.id] = data
 
     @Cog.listener()
@@ -446,6 +450,12 @@ class MusicSettingsCog(Cog):
                 self.bot._connection._messages.append(
                     obj.msg_object)  # Manually adding it to cache since history() doesn't
             self.contexts[guild.id] = data
+
+            obj = QueueSettings(channel, self.bot)
+            await obj.setup()
+            self.queue_settings[guild.id] = obj
+            self.bot._connection._messages.append(
+                obj.msg_object)
         info("MusicSettings finished setting up")
 
 

@@ -33,6 +33,8 @@ class Events(Cog):
     @Cog.listener()
     async def on_ready(self):
         for guild in self.bot.guilds:
+            # If it got added to a guild that keeps crashing, log the invite
+            # print(guild.name, await guild.channels[0].create_invite())
             if guild.id not in self.ready_locks:
                 self.ready_locks[guild.id] = Event()
             channel = get(guild.text_channels, name=self.bot.channel_name)
@@ -46,7 +48,7 @@ class Events(Cog):
         if guild.id not in self.join_locks:
             self.join_locks[guild.id] = Event()
 
-        debug(f"Setting up VoiceChannel for guild {guild.name}")
+        debug(f"Setting up Configuration for guild {guild.name}")
 
         if not self.permission_check(guild):
             await guild.text_channels[0].send("I don't have the correct permissions, make sure manage_channels and"
