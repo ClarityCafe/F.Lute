@@ -114,26 +114,26 @@ Pan: {self.fx.angle} degrees
             if line.startswith("Enabled: "):
                 self.enabled = line.endswith("True")
             elif line.startswith("Pan: "):
-                self.fx.volume = float(line[5:-8])
+                self.fx.angle = float(line[5:-8])
 
     @event("\N{UP-POINTING SMALL RED TRIANGLE}")
     async def select_up(self):
-        self.fx.volume = min(self.fx.angle+1, 45)
+        self.fx.angle = min(self.fx.angle+1, 45)
         await self.update()
 
     @event("\N{DOWN-POINTING SMALL RED TRIANGLE}")
     async def select_down(self):
-        self.fx.volume = max(self.fx.angle - 1, -45)
+        self.fx.angle = max(self.fx.angle - 1, -45)
         await self.update()
 
     @event("\N{BLACK UP-POINTING DOUBLE TRIANGLE}")
     async def first(self):
-        self.fx.volume = min(self.fx.angle + 5, 45)
+        self.fx.angle = min(self.fx.angle + 5, 45)
         await self.update()
 
     @event("\N{BLACK DOWN-POINTING DOUBLE TRIANGLE}")
     async def last(self):
-        self.fx.volume = max(self.fx.angle - 5, -45)
+        self.fx.angle = max(self.fx.angle - 5, -45)
         await self.update()
 
 
