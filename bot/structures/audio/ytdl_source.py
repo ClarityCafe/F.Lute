@@ -5,12 +5,14 @@ from functools import partial
 from tempfile import NamedTemporaryFile
 
 import aiohttp
+from essentia.standard import Resample
 import youtube_dl as ytdl
 from discord import AudioSource
 from discord.ext.commands import Context
 
 from bot.bot import MusicBot
 from bot.structures.audio.numpy_source import NumpyAudioSource
+from dsp.audio_object import AudioSequence
 from dsp.handler import process_audio
 from utils.audio_tools import load_audio_file
 from utils.logging import info
@@ -88,10 +90,25 @@ class YTDLSource(AudioSource):
 
                 # load audio
                 info(f"Loading audio: {path}")
-                seq = load_audio_file(path)
+                seq = await self.loop.run_in_executor(self.executor, lambda: load_audio_file(path))
                 info("Processing")
-                new_audio = process_audio(bot, ctx, seq)
-                self.source = NumpyAudioSource(new_audio.audio, new_audio.freq)
+                new_audio = await self.loop.run_in_executor(self.executor, lambda: process_audio(bot, ctx, seq))
+
+                if new_audio.freq != 48000:
+                    l, r = new_audio / 2
+                    Q = 1
+                    nl = AudioSequence(
+                        Resample(inputSampleRate=new_audio.freq, outputSampleRate=48000, quality=Q)(l.audio),
+                        48000)
+                    nr = AudioSequence(
+                        Resample(inputSampleRate=new_audio.freq, outputSampleRate=48000, quality=Q)(r.audio),
+                        48000)
+
+                    na = nl * nr
+                else:
+                    na = new_audio
+
+                self.source = NumpyAudioSource(na.audio, na.freq)
 
     def set_data(self, data):
         self.duration = data.get("duration")

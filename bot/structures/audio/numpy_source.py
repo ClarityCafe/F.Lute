@@ -14,7 +14,8 @@ class NumpyAudioSource(AudioSource):
         self.sample_rate = sample_rate
 
     def read(self):
-        audio = self.buffer.read(int(Encoder.FRAME_SIZE / 48000 * self.sample_rate))
+        # audio = self.buffer.read(int(Encoder.FRAME_SIZE / 48000 * self.sample_rate))
+        audio = self.buffer.read(Encoder.FRAME_SIZE)
         return audio
 
     def cleanup(self):
