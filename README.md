@@ -10,12 +10,8 @@ F-Lute is a discord bot aiming to provide high-quality music with a fully custom
 Done:
 
 - Role-based access to commands
-
-WIP:
-
 - Reaction-based configuration
 
-TODO:
 
 - AudioFX
   - Volume

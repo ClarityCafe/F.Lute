@@ -18,6 +18,9 @@ class Commands(Cog):
 
     @command()
     async def play(self, ctx: Context, *, song: str):
+        if self.bot.get_cog("RoleAccessCog").get_access_role(ctx.guild) not in ctx.author.roles:
+            return await ctx.send("You do not have the role configured to play songs!")
+
         ct = self.contexts[ctx.guild.id]
         source = YTDLSource(song)
         source.set_requester(ctx.author)
