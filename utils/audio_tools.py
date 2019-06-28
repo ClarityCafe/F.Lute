@@ -1,8 +1,8 @@
 from essentia.standard import AudioLoader
 
-from bot.structures.audio.numpy_source import NumpyAudioSource
+from dsp.audio_object import AudioSequence
 
 
-def load_audio_file(path: str) -> NumpyAudioSource:
+def load_audio_file(path: str) -> AudioSequence:
     audio, sample_rate, *_ = AudioLoader(filename=path)()
-    return NumpyAudioSource(audio, sample_rate)
+    return AudioSequence(audio, freq=sample_rate)

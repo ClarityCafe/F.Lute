@@ -7,6 +7,7 @@ class MusicBot(Bot):
     __cogs = (
         "bot.cogs.events",
         "bot.cogs.audio_commands",
+        "bot.cogs.music_settings",
         "bot.cogs.role_access",
         "bot.cogs.voice_channel"
     )

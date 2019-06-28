@@ -1,9 +1,13 @@
+import asyncio
+from contextlib import suppress
 from typing import Type
 
 from discord import VoiceChannel, AudioSource
 from discord.ext.commands import Context
 
+from bot.structures.audio.numpy_source import NumpyAudioSource
 from bot.structures.audio.queue import Queue, QABC
+from bot.structures.audio.ytdl_source import YTDLSource
 from utils.logging import info
 
 
@@ -45,12 +49,15 @@ class VoiceContext:
 class ContextAudioSource(AudioSource):
     def __init__(self, context: VoiceContext):
         self.ctx = context
-        self.current_source: AudioSource = None
+        self.current_source: YTDLSource = None
+
+    def next_source(self):
+        self.current_source = self.ctx.queue.pop()
 
     def read(self) -> bytes:
         if self.current_source is None:
             if self.ctx.queue:
-                self.current_source = self.ctx.queue.pop()
+                self.next_source()
             else:
                 return b""
 
@@ -58,7 +65,7 @@ class ContextAudioSource(AudioSource):
         if not data:
             self.current_source.cleanup()
             if self.ctx.queue:
-                self.current_source = self.ctx.queue.pop()
+                self.next_source()
                 data = self.current_source.read()
             else:
                 self.current_source = None
