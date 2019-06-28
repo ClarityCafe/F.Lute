@@ -367,6 +367,10 @@ class QueueSettings(MenuContext):
         super().__init__(*args)
         self.fair = True
 
+    async def setup(self):
+        await super().setup()
+        await self.update()
+
     async def update(self):
         await self.set_message(f"""
 Fair Queue: {self.fair}
