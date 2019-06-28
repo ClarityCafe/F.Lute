@@ -1,6 +1,6 @@
 from typing import Dict
 
-from discord import Guild, PermissionOverwrite, TextChannel, Member, Reaction
+from discord import Guild, PermissionOverwrite, TextChannel, VoiceChannel as VC, Member, Reaction
 from discord.abc import GuildChannel
 from discord.utils import get
 
@@ -138,19 +138,19 @@ class VoiceChannelCog(Cog):
 
     @Cog.listener()
     async def on_guild_channel_create(self, channel: GuildChannel):
-        if isinstance(channel, VoiceChannel) and channel.guild.id in self.contexts:
+        if isinstance(channel, VC) and channel.guild.id in self.contexts:
             await self.contexts[channel.guild.id].refresh_role_list()
 
     @Cog.listener()
     async def on_guild_channel_delete(self, channel: GuildChannel):
-        if isinstance(channel, VoiceChannel) and channel.guild.id in self.contexts:
+        if isinstance(channel, VC) and channel.guild.id in self.contexts:
             await self.contexts[channel.guild.id].refresh_role_list()
         elif channel.name == self.bot.channel_name:
             del self.contexts[channel.guild.id]
 
     @Cog.listener()
     async def on_guild_channel_update(self, before: GuildChannel, after: GuildChannel):
-        if isinstance(after, VoiceChannel) and after.guild.id in self.contexts:
+        if isinstance(after, VC) and after.guild.id in self.contexts:
             await self.contexts[after.guild.id].refresh_role_list()
 
 

@@ -43,6 +43,8 @@ class VolumeSettings(MusicSettings):
         return self.fx.process(audio)
 
     async def update(self):
+        self.fx.volume = round(self.fx.volume * 10) / 10
+
         await self.set_message(f"""
 Enabled: {self.enabled}
 Volume: {self.fx.volume}dB
@@ -52,9 +54,9 @@ Volume: {self.fx.volume}dB
         content = self.msg_object.content
         message = content[7 + len(self.id):-3]
         lines = message.split("\n")
-        for line in lines[1:]:
+        for line in lines:
             if line.startswith("Enabled: "):
-                self.enabled = line.endswith("True")
+                self.enabled = line.strip().endswith("True")
             elif line.startswith("Volume: "):
                 self.fx.volume = float(line[8:-2])
 
@@ -110,9 +112,9 @@ Pan: {self.fx.angle} degrees
         content = self.msg_object.content
         message = content[7 + len(self.id):-3]
         lines = message.split("\n")
-        for line in lines[1:]:
+        for line in lines:
             if line.startswith("Enabled: "):
-                self.enabled = line.endswith("True")
+                self.enabled = line.strip().endswith("True")
             elif line.startswith("Pan: "):
                 self.fx.angle = float(line[5:-8])
 
@@ -159,6 +161,8 @@ class SpeedSettings(MusicSettings):
         return self.fx.process(audio)
 
     async def update(self):
+        self.fx.speed = round(self.fx.speed * 10) / 10
+
         await self.set_message(f"""
 Enabled: {self.enabled}
 Speed: {self.fx.speed}x
@@ -168,9 +172,9 @@ Speed: {self.fx.speed}x
         content = self.msg_object.content
         message = content[7 + len(self.id):-3]
         lines = message.split("\n")
-        for line in lines[1:]:
+        for line in lines:
             if line.startswith("Enabled: "):
-                self.enabled = line.endswith("True")
+                self.enabled = line.strip().endswith("True")
             elif line.startswith("Speed: "):
                 self.fx.speed = float(line[7:-1])
 
@@ -225,9 +229,9 @@ Enabled: {self.enabled}
         content = self.msg_object.content
         message = content[7 + len(self.id):-3]
         lines = message.split("\n")
-        for line in lines[1:]:
+        for line in lines:
             if line.startswith("Enabled: "):
-                self.enabled = line.endswith("True")
+                self.enabled = line.strip().endswith("True")
 
     @event("\N{WHITE HEAVY CHECK MARK}")
     async def enable(self):
@@ -260,9 +264,9 @@ Enabled: {self.enabled}
         content = self.msg_object.content
         message = content[7 + len(self.id):-3]
         lines = message.split("\n")
-        for line in lines[1:]:
+        for line in lines:
             if line.startswith("Enabled: "):
-                self.enabled = line.endswith("True")
+                self.enabled = line.strip().endswith("True")
 
     @event("\N{WHITE HEAVY CHECK MARK}")
     async def enable(self):
@@ -316,9 +320,9 @@ Enabled: {self.enabled}
         message = content[7 + len(self.id):-3]
         lines = message.split("\n")
         setting = ""
-        for line in lines[1:]:
+        for line in lines:
             if line.startswith("Enabled: "):
-                self.enabled = line.endswith("True")
+                self.enabled = line.strip().endswith("True")
             elif line.startswith("> "):
                 setting = line[2:]
                 break
@@ -385,9 +389,9 @@ Fair Queue: {self.fair}
         content = self.msg_object.content
         message = content[7 + len(self.id):-3]
         lines = message.split("\n")
-        for line in lines[1:]:
+        for line in lines:
             if line.startswith("Fair Queue: "):
-                self.fair = line.endswith("True")
+                self.fair = line.strip().endswith("True")
 
     @event("\N{WHITE HEAVY CHECK MARK}")
     async def enable(self):

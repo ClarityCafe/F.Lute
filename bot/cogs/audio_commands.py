@@ -30,24 +30,25 @@ class Commands(Cog):
         if self.bot.get_cog("RoleAccessCog").get_access_role(ctx.guild) not in ctx.author.roles:
             return await ctx.send("You do not have the role configured to skip songs!")
 
-        self.contexts[ctx.guild.id].source.skip()
+        self.contexts[ctx.guild.id].source.current_source.skip()
         await ctx.send("Skipping song!")
 
     @command()
     async def play(self, ctx: Context, *, song: str):
         """ Plays a song """
-        if self.bot.get_cog("RoleAccessCog").get_access_role(ctx.guild) not in ctx.author.roles:
-            return await ctx.send("You do not have the role configured to play songs!")
+        async with ctx.typing():
+            if self.bot.get_cog("RoleAccessCog").get_access_role(ctx.guild) not in ctx.author.roles:
+                return await ctx.send("You do not have the role configured to play songs!")
 
-        ct = self.contexts[ctx.guild.id]
-        source = YTDLSource(song)
-        source.set_requester(ctx.author)
-        await source.load()
-        await source.load_data(self.bot, ctx)  # WILL MEMORY HOG!
-        # TODO: Load_data only when it's in the next 2 songs to play?
-        ct.play_source(ctx, source)
-        info("Notifying user")
-        await ctx.send(f"Added to Queue: {source.title}")
+            ct = self.contexts[ctx.guild.id]
+            source = YTDLSource(song)
+            source.set_requester(ctx.author)
+            await source.load()
+            await source.load_data(self.bot, ctx)  # WILL MEMORY HOG!
+            # TODO: Load_data only when it's in the next 2 songs to play?
+            ct.play_source(ctx, source)
+            info("Notifying user")
+            await ctx.send(f"Added to Queue: {source.title}")
 
     @Cog.listener()
     async def on_ready(self):

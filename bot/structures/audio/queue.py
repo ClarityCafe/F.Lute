@@ -77,7 +77,7 @@ class RotatingQueue(QABC):
 
     def list(self) -> List[AudioSource]:
         res = []
-        for items in zip_longest(self._queues.values()):
+        for items in zip_longest(*self._queues.values()):
             for it in items:
                 if it is not None:
                     res.append(it)
