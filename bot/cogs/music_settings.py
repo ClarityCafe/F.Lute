@@ -1,3 +1,4 @@
+from asyncio import sleep
 from typing import Dict
 
 from discord import Member, Reaction, Guild
@@ -376,7 +377,7 @@ class QueueSettings(MenuContext):
 Fair Queue: {self.fair}
         """.strip())
 
-        self.bot.get_cog('VoiceChannelCog').contexts[self.channel.guild.id].swap_queue(
+        self.bot.get_cog('Commands').contexts[self.channel.guild.id].swap_queue(
             [Queue, RotatingQueue][self.fair]
         )
 
