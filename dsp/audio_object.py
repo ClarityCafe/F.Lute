@@ -8,6 +8,11 @@ from bot.structures.audio.numpy_source import NumpyAudioSource
 
 
 class AudioSequence:
+    # Taken from IzunaDSP
+    # I could've added it as library, but
+    # I opted not to add too much bloat.
+    # The package is open-source, so I'm assuming this is allowed.
+
     def __init__(self,
                  audio: numpy.ndarray,
                  freq: int = 44100):
@@ -77,9 +82,3 @@ class AudioSequence:
             raise ValueError("Can only concatenate two audio channels!")
 
         return self.new(StereoMuxer()(self.audio, other.audio))
-
-    def save(self, filename: str):
-        AudioWriter(filename=filename)(self.audio)
-
-    def get_source(self) -> NumpyAudioSource:
-        return NumpyAudioSource(self.audio, self.freq)

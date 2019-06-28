@@ -38,6 +38,7 @@ class YTDLSource(AudioSource):
         self.executor = executor
         self.loop = loop or asyncio.get_event_loop()
         self._done = False
+        self._skip = False
         self._fname = ""
 
         self.source = None
@@ -59,6 +60,9 @@ class YTDLSource(AudioSource):
 
     def __repr__(self):
         return f"YTDLSource(title='{self.title}', url='{self.url}')"
+
+    def skip(self):
+        self._skip = True
 
     async def load(self):
         with ytdl.YoutubeDL(self.opts) as dl:
@@ -126,6 +130,9 @@ class YTDLSource(AudioSource):
         self.tags = data.get("tags")
 
     def read(self):
+        if self._skip:
+            return b""
+
         return self.source.read()
 
     def cleanup(self):

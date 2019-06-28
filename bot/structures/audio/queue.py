@@ -1,4 +1,5 @@
 from abc import abstractmethod, ABC
+from itertools import zip_longest
 from typing import Dict, List, Tuple
 
 from discord import AudioSource
@@ -26,6 +27,10 @@ class QABC(ABC):
     def peek(self) -> AudioSource:
         ...
 
+    @abstractmethod
+    def list(self) -> List[AudioSource]:
+        ...
+
     def __bool__(self) -> bool:
         return False
 
@@ -36,6 +41,9 @@ class Queue(QABC):
     def __init__(self):
         self._users: List[int] = []
         self._queue: List[AudioSource] = []
+
+    def list(self) -> List[AudioSource]:
+        return self._queue
 
     def add(self, ctx: Context, source: AudioSource):
         self.add_raw(ctx.author.id, source)
@@ -66,6 +74,15 @@ class RotatingQueue(QABC):
     def __init__(self):
         self._queues: Dict[int, List[AudioSource]] = {}
         self._users: List[int] = []
+
+    def list(self) -> List[AudioSource]:
+        res = []
+        for items in zip_longest(self._queues.values()):
+            for it in items:
+                if it is not None:
+                    res.append(it)
+
+        return res
 
     def add_raw(self, uid: int, source: AudioSource):
         if uid not in self._users:

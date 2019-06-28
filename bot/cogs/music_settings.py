@@ -4,6 +4,7 @@ from discord import Member, Reaction, Guild
 from discord.utils import get
 
 from bot.bot import MusicBot
+from bot.structures.audio.queue import Queue, RotatingQueue
 from bot.structures.cog import Cog
 from bot.structures.menu import MenuContext, event, event_class
 from dsp.audio_object import AudioSequence
@@ -358,9 +359,46 @@ Enabled: {self.enabled}
         await self.update()
 
 
+@event_class
+class QueueSettings(MenuContext):
+    id = "Queue"
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.fair = True
+
+    async def update(self):
+        await self.set_message(f"""
+Fair Queue: {self.fair}
+        """.strip())
+
+        self.bot.get_cog('VoiceChannelCog').contexts[self.channel.guild.id].swap_queue(
+            [Queue, RotatingQueue][self.fair]
+        )
+
+    async def load(self):
+        content = self.msg_object.content
+        message = content[7 + len(self.id):-3]
+        lines = message.split("\n")
+        for line in lines[1:]:
+            if line.startswith("Fair Queue: "):
+                self.fair = line.endswith("True")
+
+    @event("\N{WHITE HEAVY CHECK MARK}")
+    async def enable(self):
+        self.fair = True
+        await self.update()
+
+    @event("\N{NEGATIVE SQUARED CROSS MARK}")
+    async def disable(self):
+        self.fair = False
+        await self.update()
+
+
 class MusicSettingsCog(Cog):
     EXT_CLASSES = (VolumeSettings, EqualizerSettings, SpeedSettings,
-                   ReverberationSettings, EqualLoudnessSettings, PanSettings)
+                   ReverberationSettings, EqualLoudnessSettings, PanSettings,
+                   QueueSettings)
 
     def __init__(self, bot: MusicBot):
         super().__init__(bot)

@@ -17,7 +17,25 @@ class Commands(Cog):
         self.contexts: Dict[int, VoiceContext] = {}
 
     @command()
+    async def playlist(self, ctx: Context):
+        """ Fetches the playlist """
+        queue = self.contexts[ctx.guild.id].queue
+        songs = queue.list()
+        await ctx.send("\n".join(f"{song.title} - Requested by {song.requester.name}" for song in songs[:10]))
+
+    @command()
+    async def skip(self, ctx: Context):
+        """ Skips the currently playing song """
+
+        if self.bot.get_cog("RoleAccessCog").get_access_role(ctx.guild) not in ctx.author.roles:
+            return await ctx.send("You do not have the role configured to skip songs!")
+
+        self.contexts[ctx.guild.id].source.skip()
+        await ctx.send("Skipping song!")
+
+    @command()
     async def play(self, ctx: Context, *, song: str):
+        """ Plays a song """
         if self.bot.get_cog("RoleAccessCog").get_access_role(ctx.guild) not in ctx.author.roles:
             return await ctx.send("You do not have the role configured to play songs!")
 

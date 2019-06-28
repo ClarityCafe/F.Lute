@@ -1,5 +1,3 @@
-from typing import List
-
 import numpy
 from essentia.standard import BandPass, HighPass, LowPass
 
@@ -9,6 +7,7 @@ from dsp.utils import multiplier_from_db
 
 
 class PRESETS:
+    # Taken straight from Viper4AndroidFX, source of inspiration
     FLAT                  = [  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0]
     VOCAL_BOOST           = [ -2.5, -2.5,  0.0,  0.0,  0.0,  0.0,  0.6,  3.5,  1.5, -2.0]
     TREBLE_REDUCE         = [  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -6.5, -4.0]
