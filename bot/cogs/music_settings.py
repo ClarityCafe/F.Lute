@@ -9,8 +9,13 @@ from bot.structures.audio.queue import Queue, RotatingQueue
 from bot.structures.cog import Cog
 from bot.structures.menu import MenuContext, event, event_class
 from dsp.audio_object import AudioSequence
-from dsp.modules import VolumeModule, PanModule, EqualLoudnessModule, ReverbModule, SpeedModule, EqualizerModule
-from dsp.modules.equalizer import PRESETS
+from dsp.modules.equal_loudness import EqualLoudnessModule
+from dsp.modules.equalizer import PRESETS, EqualizerModule
+from dsp.modules.fade import FadeModule
+from dsp.modules.pan import PanModule
+from dsp.modules.reverb import ReverbModule
+from dsp.modules.speed import SpeedModule
+from dsp.modules.volume import VolumeModule
 from utils.logging import info, debug
 
 
@@ -136,6 +141,64 @@ Pan: {self.fx.angle} degrees
     @event("\N{BLACK DOWN-POINTING DOUBLE TRIANGLE}")
     async def last(self):
         self.fx.angle = max(self.fx.angle - 5, -45)
+        await self.update()
+
+    @event("\N{WHITE HEAVY CHECK MARK}")
+    async def enable(self):
+        self.enabled = True
+        await self.update()
+
+    @event("\N{NEGATIVE SQUARED CROSS MARK}")
+    async def disable(self):
+        self.enabled = False
+        await self.update()
+
+
+@event_class
+class FadeSettings(MusicSettings):
+    id = "Fade-In-Out"
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.fx = FadeModule()
+
+    def process(self, audio: AudioSequence) -> AudioSequence:
+        return self.fx.process(audio)
+
+    async def update(self):
+        await self.set_message(f"""
+Enabled: {self.enabled}
+Fade time: {self.fx.fade_time}ms
+        """.strip())
+
+    async def load(self):
+        content = self.msg_object.content
+        message = content[7 + len(self.id):-3]
+        lines = message.split("\n")
+        for line in lines:
+            if line.startswith("Enabled: "):
+                self.enabled = line.strip().endswith("True")
+            elif line.startswith("Fade time: "):
+                self.fx.speed = float(line[11:-2])
+
+    @event("\N{UP-POINTING SMALL RED TRIANGLE}")
+    async def select_up(self):
+        self.fx.fade_time = min(self.fx.fade_time + 10, 1000)
+        await self.update()
+
+    @event("\N{DOWN-POINTING SMALL RED TRIANGLE}")
+    async def select_down(self):
+        self.fx.fade_time = max(self.fx.fade_time - 10, 100)
+        await self.update()
+
+    @event("\N{BLACK UP-POINTING DOUBLE TRIANGLE}")
+    async def first(self):
+        self.fx.fade_time = min(self.fx.fade_time + 50, 1000)
+        await self.update()
+
+    @event("\N{BLACK DOWN-POINTING DOUBLE TRIANGLE}")
+    async def last(self):
+        self.fx.fade_time = max(self.fx.fade_time - 50, 100)
         await self.update()
 
     @event("\N{WHITE HEAVY CHECK MARK}")
@@ -406,7 +469,8 @@ Fair Queue: {self.fair}
 
 class MusicSettingsCog(Cog):
     EXT_CLASSES = (VolumeSettings, EqualizerSettings, SpeedSettings,
-                   ReverberationSettings, EqualLoudnessSettings, PanSettings)
+                   ReverberationSettings, EqualLoudnessSettings, PanSettings,
+                   FadeSettings)
 
     def __init__(self, bot: MusicBot):
         super().__init__(bot)
