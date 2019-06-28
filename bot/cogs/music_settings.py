@@ -5,51 +5,36 @@ from discord.utils import get
 
 from bot.bot import MusicBot
 from bot.structures.cog import Cog
-from bot.structures.menu import MenuContext, event
+from bot.structures.menu import MenuContext, event, event_class
 from dsp.audio_object import AudioSequence
-from dsp.modules import VolumeModule, PanModule
+from dsp.modules import VolumeModule, PanModule, EqualLoudnessModule, ReverbModule, SpeedModule, EqualizerModule
+from dsp.modules.equalizer import PRESETS
 from utils.logging import info, debug
 
 
 class MusicSettings(MenuContext):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.enabled = False
         self.fx = None
+
+    async def update(self):
+        pass
+
+    async def setup(self):
+        await super().setup()
+        await self.update()
 
     def process(self, audio: AudioSequence) -> AudioSequence:
         return audio
 
-    @event("\N{WHITE HEAVY CHECK MARK}")
-    def enable(self):
-        self.enabled = True
 
-    @event("\N{NEGATIVE SQUARED CROSS MARK}")
-    def enable(self):
-        self.enabled = False
-
-    """
-    
-    @event("\N{UP-POINTING SMALL RED TRIANGLE}")
-    async def select_up(self):
-        await self.update()
-
-    @event("\N{DOWN-POINTING SMALL RED TRIANGLE}")
-    async def select_down(self):
-        await self.update()
-
-    @event("\N{BLACK UP-POINTING DOUBLE TRIANGLE}")
-    async def first(self):
-        await self.update()
-
-    @event("\N{BLACK DOWN-POINTING DOUBLE TRIANGLE}")
-    async def last(self):
-        await self.update()
-    """
-
-
+@event_class
 class VolumeSettings(MusicSettings):
-    def __init__(self):
-        super().__init__()
+    id = "Volume"
+
+    def __init__(self, *args):
+        super().__init__(*args)
         self.fx = VolumeModule()
 
     def process(self, audio: AudioSequence) -> AudioSequence:
@@ -59,7 +44,7 @@ class VolumeSettings(MusicSettings):
         await self.set_message(f"""
 Enabled: {self.enabled}
 Volume: {self.fx.volume}dB
-        """)
+        """.strip())
 
     async def load(self):
         content = self.msg_object.content
@@ -91,10 +76,23 @@ Volume: {self.fx.volume}dB
         self.fx.volume = max(self.fx.volume - 1, -10)
         await self.update()
 
+    @event("\N{WHITE HEAVY CHECK MARK}")
+    async def enable(self):
+        self.enabled = True
+        await self.update()
 
+    @event("\N{NEGATIVE SQUARED CROSS MARK}")
+    async def disable(self):
+        self.enabled = False
+        await self.update()
+
+
+@event_class
 class PanSettings(MusicSettings):
-    def __init__(self):
-        super().__init__()
+    id = "Panning"
+
+    def __init__(self, *args):
+        super().__init__(*args)
         self.fx = PanModule()
 
     def process(self, audio: AudioSequence) -> AudioSequence:
@@ -104,7 +102,7 @@ class PanSettings(MusicSettings):
         await self.set_message(f"""
 Enabled: {self.enabled}
 Pan: {self.fx.angle} degrees
-        """)
+        """.strip())
 
     async def load(self):
         content = self.msg_object.content
@@ -136,9 +134,233 @@ Pan: {self.fx.angle} degrees
         self.fx.angle = max(self.fx.angle - 5, -45)
         await self.update()
 
+    @event("\N{WHITE HEAVY CHECK MARK}")
+    async def enable(self):
+        self.enabled = True
+        await self.update()
+
+    @event("\N{NEGATIVE SQUARED CROSS MARK}")
+    async def disable(self):
+        self.enabled = False
+        await self.update()
+
+
+@event_class
+class SpeedSettings(MusicSettings):
+    id = "Playback-Speed"
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.fx = SpeedModule()
+
+    def process(self, audio: AudioSequence) -> AudioSequence:
+        return self.fx.process(audio)
+
+    async def update(self):
+        await self.set_message(f"""
+Enabled: {self.enabled}
+Speed: {self.fx.speed}x
+        """.strip())
+
+    async def load(self):
+        content = self.msg_object.content
+        message = content[7 + len(self.id):-3]
+        lines = message.split("\n")
+        for line in lines[1:]:
+            if line.startswith("Enabled: "):
+                self.enabled = line.endswith("True")
+            elif line.startswith("Speed: "):
+                self.fx.speed = float(line[7:-1])
+
+    @event("\N{UP-POINTING SMALL RED TRIANGLE}")
+    async def select_up(self):
+        self.fx.speed = min(self.fx.speed + 0.1, 2)
+        await self.update()
+
+    @event("\N{DOWN-POINTING SMALL RED TRIANGLE}")
+    async def select_down(self):
+        self.fx.speed = max(self.fx.speed - 0.1, 0.1)
+        await self.update()
+
+    @event("\N{BLACK UP-POINTING DOUBLE TRIANGLE}")
+    async def first(self):
+        self.fx.speed = min(self.fx.speed + 0.5, 2)
+        await self.update()
+
+    @event("\N{BLACK DOWN-POINTING DOUBLE TRIANGLE}")
+    async def last(self):
+        self.fx.speed = max(self.fx.speed - 0.5, 0.1)
+        await self.update()
+
+    @event("\N{WHITE HEAVY CHECK MARK}")
+    async def enable(self):
+        self.enabled = True
+        await self.update()
+
+    @event("\N{NEGATIVE SQUARED CROSS MARK}")
+    async def disable(self):
+        self.enabled = False
+        await self.update()
+
+
+@event_class
+class ReverberationSettings(MusicSettings):
+    id = "Reverberation"
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.fx = ReverbModule()
+
+    def process(self, audio: AudioSequence) -> AudioSequence:
+        return self.fx.process(audio)
+
+    async def update(self):
+        await self.set_message(f"""
+Enabled: {self.enabled}
+        """.strip())
+
+    async def load(self):
+        content = self.msg_object.content
+        message = content[7 + len(self.id):-3]
+        lines = message.split("\n")
+        for line in lines[1:]:
+            if line.startswith("Enabled: "):
+                self.enabled = line.endswith("True")
+
+    @event("\N{WHITE HEAVY CHECK MARK}")
+    async def enable(self):
+        self.enabled = True
+        await self.update()
+
+    @event("\N{NEGATIVE SQUARED CROSS MARK}")
+    async def disable(self):
+        self.enabled = False
+        await self.update()
+
+
+@event_class
+class EqualLoudnessSettings(MusicSettings):
+    id = "EqualLoudness"
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.fx = EqualLoudnessModule()
+
+    def process(self, audio: AudioSequence) -> AudioSequence:
+        return self.fx.process(audio)
+
+    async def update(self):
+        await self.set_message(f"""
+Enabled: {self.enabled}
+        """.strip())
+
+    async def load(self):
+        content = self.msg_object.content
+        message = content[7 + len(self.id):-3]
+        lines = message.split("\n")
+        for line in lines[1:]:
+            if line.startswith("Enabled: "):
+                self.enabled = line.endswith("True")
+
+    @event("\N{WHITE HEAVY CHECK MARK}")
+    async def enable(self):
+        self.enabled = True
+        await self.update()
+
+    @event("\N{NEGATIVE SQUARED CROSS MARK}")
+    async def disable(self):
+        self.enabled = False
+        await self.update()
+
+
+@event_class
+class EqualizerSettings(MusicSettings):
+    id = "Equalizer"
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.fx = EqualizerModule()
+        self.selected = "FLAT"
+        self.options = [
+            "FLAT",
+            "VOCAL_BOOST",
+            "TREBLE_REDUCE",
+            "TREBLE_BOOST",
+            "SMALL_SPEAKERS",
+            "ROCK",
+            "R_AND_B",
+            "DEEP",
+            "CLASSICAL",
+            "BASS_REDUCE",
+            "BASS_BOOST"
+        ]
+
+    def process(self, audio: AudioSequence) -> AudioSequence:
+        return self.fx.process(audio)
+
+    async def update(self):
+        self.fx.eq = getattr(PRESETS, self.selected)
+
+        EQ = "\n".join(f"{'->'[setting == self.selected]} {setting}"
+                       for setting in self.options)
+
+        await self.set_message(f"""
+Enabled: {self.enabled}
+{EQ}
+    """.strip())
+
+    async def load(self):
+        content = self.msg_object.content
+        message = content[7 + len(self.id):-3]
+        lines = message.split("\n")
+        setting = ""
+        for line in lines[1:]:
+            if line.startswith("Enabled: "):
+                self.enabled = line.endswith("True")
+            elif line.startswith("> "):
+                setting = line[2:]
+                break
+
+        self.selected = setting
+
+    @event("\N{UP-POINTING SMALL RED TRIANGLE}")
+    async def select_up(self):
+        index = self.options.index(self.selected)
+        new_index = max(0, index - 1)
+        self.selected = self.options[new_index]
+        await self.update()
+
+    @event("\N{DOWN-POINTING SMALL RED TRIANGLE}")
+    async def select_down(self):
+        index = self.options.index(self.selected)
+        new_index = min(len(self.options) - 1, index + 1)
+        self.selected = self.options[new_index]
+        await self.update()
+
+    @event("\N{BLACK UP-POINTING DOUBLE TRIANGLE}")
+    async def first(self):
+        self.selected = self.options[0]
+        await self.update()
+
+    @event("\N{BLACK DOWN-POINTING DOUBLE TRIANGLE}")
+    async def last(self):
+        self.selected = self.options[-1]
+        await self.update()
+
+    @event("\N{WHITE HEAVY CHECK MARK}")
+    async def enable(self):
+        self.enabled = True
+        await self.update()
+
+    @event("\N{NEGATIVE SQUARED CROSS MARK}")
+    async def disable(self):
+        self.enabled = False
+        await self.update()
+
 
 class MusicSettingsCog(Cog):
-    EXT_CLASSES = (VolumeSettings, PanSettings)
+    EXT_CLASSES = (VolumeSettings, EqualizerSettings, SpeedSettings,
+                   ReverberationSettings, EqualLoudnessSettings, PanSettings)
 
     def __init__(self, bot: MusicBot):
         super().__init__(bot)
