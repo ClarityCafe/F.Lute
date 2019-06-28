@@ -44,6 +44,9 @@ class Commands(Cog):
             source = YTDLSource(song)
             source.set_requester(ctx.author)
             await source.load()
+            if source.duration > 8 * 60:
+                return await ctx.send(f"Song duration too long! ({source.duration} seconds, max 8 minutes)")
+
             await source.load_data(self.bot, ctx)  # WILL MEMORY HOG!
             # TODO: Load_data only when it's in the next 2 songs to play?
             ct.play_source(ctx, source)
