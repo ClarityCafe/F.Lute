@@ -13,8 +13,12 @@
         "description": "Prefix for the bot",
         "value": "flute "
       },
+      "FLUTE_CHANNEL_NAME": {
+        "description": "The configuration channel for the bot, this is required.",
+        "value": "flute-config"
+      },
       "FLUTE_BOT_ID": {
-        "description": "the client ID for the bot.",
+        "description": "The Discord client ID for the bot.",
         "value": ""
       },
       "FLUTE_BOT_TOKEN": {
