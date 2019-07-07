@@ -10,6 +10,9 @@ from bot.structures.cog import Cog
 from utils.logging import debug
 
 
+DBOTS_GUILD = 110373943822540800
+
+
 class Events(Cog):
     join_locks: Dict[int, Event] = {}
     ready_locks: Dict[int, Event] = {}
@@ -37,16 +40,21 @@ class Events(Cog):
             # print(guild.name, await guild.channels[0].create_invite())
             if guild.id not in self.ready_locks:
                 self.ready_locks[guild.id] = Event()
-            channel = get(guild.text_channels, name=self.bot.channel_name)
-            if channel is None:
-                await self.on_guild_join(guild)
-                continue
-            self.ready_locks[guild.id].set()
+
+            if guild.id != DBOTS_GUILD:
+                channel = get(guild.text_channels, name=self.bot.channel_name)
+                if channel is None:
+                    await self.on_guild_join(guild)
+                    continue
+                self.ready_locks[guild.id].set()
 
     @Cog.listener()
     async def on_guild_join(self, guild: Guild):
         if guild.id not in self.join_locks:
             self.join_locks[guild.id] = Event()
+
+        if guild.id == DBOTS_GUILD:
+            return
 
         debug(f"Setting up Configuration for guild {guild.name}")
 
