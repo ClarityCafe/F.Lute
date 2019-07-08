@@ -4,8 +4,12 @@ FROM python:slim
 USER root
 RUN mkdir /app && \
     apt update && \
-    apt install -y ffmpeg && \
-    apt clean -f;
+    apt install -y ffmpeg \
+        libavresample4 \
+        libtag1v5 \
+        libchromaprint1 \
+        pkg-config && \
+    apt clean;  
 
 # Install Python dependencies
 COPY requirements.txt /app
