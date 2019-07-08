@@ -5,7 +5,7 @@ USER root
 RUN mkdir /app && \
     apt update && \
     apt install -y ffmpeg \
-        libavresample4 \
+        libavresample3 \
         libtag1v5 \
         libchromaprint1 \
         pkg-config && \
