@@ -2,7 +2,10 @@ FROM python:slim
 
 # Make container root
 USER root
-RUN mkdir /app
+RUN mkdir /app && \
+    apt update && \
+    apt install ffmpeg ffprobe && \
+    apt clean -f;
 
 # Install Python dependencies
 COPY requirements.txt /app
