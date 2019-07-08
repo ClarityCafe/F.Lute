@@ -4,7 +4,7 @@ FROM python:slim
 USER root
 RUN mkdir /app && \
     apt update && \
-    apt install ffmpeg ffprobe && \
+    apt install -y ffmpeg && \
     apt clean -f;
 
 # Install Python dependencies
