@@ -2,7 +2,14 @@ FROM python:slim
 
 # Make container root
 USER root
-RUN mkdir /app
+RUN mkdir /app && \
+    apt update && \
+    apt install -y ffmpeg \
+        libavresample3 \
+        libtag1v5 \
+        libchromaprint1 \
+        pkg-config && \
+    apt clean;  
 
 # Install Python dependencies
 COPY requirements.txt /app
