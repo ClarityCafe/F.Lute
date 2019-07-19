@@ -5,6 +5,7 @@ from discord.abc import GuildChannel
 from discord.utils import get
 
 from bot.bot import MusicBot
+from bot.cogs.events import DBOTS_GUILD
 from bot.structures.cog import Cog
 from bot.structures.menu import MenuContext, event_class, event
 from utils.logging import info, debug
@@ -116,6 +117,9 @@ class VoiceChannelCog(Cog):
     @Cog.listener()
     async def on_ready(self):
         for guild in self.bot.guilds:
+            if guild.id == DBOTS_GUILD:
+                continue
+
             info(f"Setting up VoiceChannel for guild {guild.name}")
             await self.bot.get_cog('Events').wait_for_ready_complete(guild)
             channel = get(guild.text_channels, name=self.bot.channel_name)

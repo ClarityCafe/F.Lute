@@ -5,6 +5,7 @@ from discord.abc import GuildChannel
 from discord.ext.commands import command, Context
 
 from bot.bot import MusicBot
+from bot.cogs.events import DBOTS_GUILD
 from bot.structures.audio.voice_context import VoiceContext
 from bot.structures.audio.ytdl_source import YTDLSource
 from bot.structures.cog import Cog
@@ -56,6 +57,8 @@ class Commands(Cog):
     @Cog.listener()
     async def on_ready(self):
         for guild in self.bot.guilds:
+            if guild.id == DBOTS_GUILD:
+                continue
             info(f"Setting up VoiceContext for guild {guild.name}")
             ctx = VoiceContext()
             self.contexts[guild.id] = ctx

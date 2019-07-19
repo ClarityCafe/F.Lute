@@ -46,7 +46,7 @@ class Events(Cog):
                 if channel is None:
                     await self.on_guild_join(guild)
                     continue
-                self.ready_locks[guild.id].set()
+            self.ready_locks[guild.id].set()
 
     @Cog.listener()
     async def on_guild_join(self, guild: Guild):
